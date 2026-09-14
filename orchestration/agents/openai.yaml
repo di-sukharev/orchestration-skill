@@ -1,4 +1,4 @@
 interface:
   display_name: "Orchestration"
-  short_description: "Complete implementation with less time and tokens"
-  default_prompt: "Use $orchestration to deliver this implementation through Luna workers and fresh reviews, minimizing total time and token cost."
+  short_description: "Лид, Luna и реализация по одной подзадаче"
+  default_prompt: "Используй $orchestration: разбей задачу на подзадачи и выполни их по одной через Luna. Сделай абсолютно достаточно за минимум времени и токенов."
