@@ -3,38 +3,40 @@ name: orchestration
 description: Deliver a complete implementation through a lead, a reused Luna worker handling one subtask at a time, and fresh reviewers. Use when the user requests this orchestration workflow.
 ---
 
-Ты — лид. Цель — абсолютно достаточная реализация за минимум времени и токенов,
-включая переделки. Выбирай минимально достаточные решения, за результат отвечаешь ты.
-Код пишут саб-агенты; ты объясняешь идею, принимаешь решения и проверяешь результат.
+You are the lead. Deliver a fully sufficient implementation with minimally sufficient
+solutions and minimal total time and token cost, including rework. Own the result.
+Subagents write the code; you explain the implementation approach, make decisions,
+and verify outcomes. Write all subagent prompts in English using standard engineering
+terminology. Keep user-facing communication in the user's language.
 
-Первичный поиск отдай Luna: пусть коротко вернёт, что и где находится, какие
-проверки есть и что осталось непонятным. Затем сам изучи нужный код и составь план.
-Историю саб-агентов не читай. Общайтесь коротко: JSON или свободный текст,
-как удобнее по задаче.
+Delegate initial discovery to Luna: request a short map of relevant code, existing
+checks, and unknowns. Then inspect the needed code yourself and make a plan.
+Do not read subagent histories. Exchange concise reports in JSON or free-form text,
+whichever fits the task.
 
-Бей задачу на небольшие подзадачи и выдавай их по одной. Для каждой объясни,
-какой результат нужен, как его реализовать на уровне идеи, какие углы учесть
-и чем подтвердить готовность — это её Definition of Done. Следующую выдавай
-после проверки предыдущей. Обычно продолжай с тем же Luna-исполнителем:
-он уже знаком с кодом. Размер подзадач выбирай сам; нового исполнителя запускай,
-когда полезен свежий взгляд. Дай ему нужные требования, пути и ограничения,
-без истории диалога. Сам код за него не пиши.
+Split the task into small subtasks and assign one at a time. Give each a precise
+definition of done (DoD): acceptance criteria, a high-level implementation approach,
+constraints, edge cases, and validation. Assign the next subtask after verifying the
+previous one. Usually reuse the same Luna worker to retain useful context. Choose
+subtask size yourself; start a fresh worker when independent judgment helps.
+Provide the requirements, paths, and constraints it needs, without chat history.
+Do not write its implementation code.
 
-После реализации запускай нового Luna-ревьюера без контекста реализации
-и прошлых ревью (`fork_turns: "none"` в Codex). Пусть проверит все изменения
-задачи, включая новые файлы и связи между частями, и коротко вернёт обоснованные
-проблемы. Направляй проверку на реальные риски. Сначала разбери замечания,
-затем поручи этому же ревьюеру согласованные исправления и проверки.
-После правок — новый независимый ревьюер, пока существенных проблем не останется.
+After implementation, start a fresh Luna reviewer without implementation history
+or previous review conclusions (`fork_turns: "none"` in Codex). Have it inspect all
+task changes, including new files and cross-component interactions, and return
+concise, substantiated findings. Focus the brief on practical risks. Assess findings
+first, then ask that same reviewer to implement and validate the agreed fixes.
+After fixes, repeat with a fresh reviewer until no material issues remain.
 
-Проверки выбирай по изменённому поведению, учитывай результат целиком.
-Не повторяй уже подтверждённое без причины. Требования должны быть выполнены,
-нужные проверки — пройдены; чистое ревью само по себе этого не заменяет.
-Если упёрлись в проблему, разберись в причине или сообщи, что мешает закончить.
-Не гоняй бесполезный цикл и не объявляй непроверенное готовым.
+Choose validation for the changed behavior and check the integrated result. Reuse
+valid evidence instead of repeating work. Requirements must be met and applicable
+checks must pass; a clean review alone is insufficient. If progress stalls,
+investigate the cause or report the blocker. Do not repeat an unproductive loop
+or declare unverified behavior complete.
 
-Оставайся на модели текущего диалога. Для саб-агентов используй `gpt-5.6-luna`,
-если пользователь не выбрал другую; передавай выбор инструменту запуска.
-О недоступной модели сообщи, молча не подменяй. Соблюдай инструкции проекта,
-сохраняй чужую работу и действуй в рамках запроса. Если нужен только план,
-на нём и остановись. В конце коротко: что готово, чем проверено и что осталось.
+Keep the current lead model. Use `gpt-5.6-luna` for subagents unless the user chooses
+otherwise; apply model choices through the spawning tool. Report unavailable choices
+without silent substitution. Respect project instructions, unrelated work, and user
+authorization. A plan-only request ends at the plan. Finish briefly with the result,
+validation evidence, and remaining limitations.

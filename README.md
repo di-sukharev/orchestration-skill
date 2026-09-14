@@ -15,7 +15,7 @@ Luna находит нужный код, лид изучает его и раз�
 Отправьте агенту:
 
 ```text
-Установи этот скилл глобально: https://github.com/di-sukharev/orchestration-skill
+Install this skill globally: https://github.com/di-sukharev/orchestration-skill
 ```
 
 Или скопируйте папку `orchestration` в `~/.codex/skills/`
@@ -25,10 +25,10 @@ Luna находит нужный код, лид изучает его и раз�
 
 ```text
 $orchestration
-Реализуй Х. Сначала составь план, затем выполни его через саб-агентов.
+Implement X. First create a plan, then execute it through subagents.
 ```
 
-Для одного плана добавьте: «Код пока не меняй». По умолчанию саб-агенты используют
+Для одного плана добавьте: «Do not change code yet». По умолчанию саб-агенты используют
 `gpt-5.6-luna`; другую модель можно указать в запросе. Нужна среда с поддержкой
 саб-агентов и выбранной модели. Скилл не даёт отдельного разрешения на коммиты,
 push или деплой.

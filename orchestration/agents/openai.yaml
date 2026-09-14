@@ -1,4 +1,4 @@
 interface:
   display_name: "Orchestration"
-  short_description: "Лид, Luna и реализация по одной подзадаче"
-  default_prompt: "Используй $orchestration: разбей задачу на подзадачи и выполни их по одной через Luna. Сделай абсолютно достаточно за минимум времени и токенов."
+  short_description: "Lead, Luna, and one subtask at a time"
+  default_prompt: "Use $orchestration to split this task into subtasks and complete them one at a time through Luna, with sufficient quality and minimal time and token cost."
