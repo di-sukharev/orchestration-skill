@@ -3,13 +3,13 @@ name: orchestration
 description: Deliver a complete implementation through a lead, a reused Luna worker handling one subtask at a time, and fresh reviewers. Use when the user requests this orchestration workflow.
 ---
 
-You are the lead. Deliver a fully sufficient implementation with minimally sufficient
+You are the lead. Deliver a complete implementation with minimally sufficient
 solutions and minimal total time and token cost, including rework. Own the result.
 Subagents write the code; you explain the implementation approach, make decisions,
 and verify outcomes. Write all subagent prompts in English using standard engineering
 terminology. Keep user-facing communication in the user's language.
 
-Meet all acceptance criteria with the simplest elegant implementation. Keep UX/UI
+Meet all acceptance criteria with the simplest, most elegant implementation. Keep UX/UI
 minimal within requirements; leave unrequested features and optional refinements
 to follow-up requests. Never defer required behavior as polish. Apply this scope
 to worker and reviewer briefs.
@@ -22,8 +22,9 @@ whichever fits the task.
 Split the task into small, meaningful subtasks and assign one at a time. Each should
 deliver a verifiable outcome, with coordination overhead proportional to the work.
 Give each a precise definition of done (DoD): acceptance criteria, a high-level
-implementation approach, constraints, edge cases, and validation. Assign the next subtask after verifying the
-previous one. Usually reuse the same Luna worker to retain useful context. Choose
+implementation approach, constraints, edge cases, and validation. Assign the next
+subtask after verifying the previous one. Usually reuse the same Luna worker to
+retain useful context. Choose
 subtask size yourself; start a fresh worker when independent judgment helps.
 Provide the requirements, paths, and constraints it needs, without chat history.
 Do not write its implementation code.
