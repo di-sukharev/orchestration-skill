@@ -1,6 +1,6 @@
 ---
 name: orchestration
-description: Plan and implement a feature through a lead agent, compact Luna code discovery, sequential Luna workers, and fresh Luna reviewers who fix their own findings. Use when the user requests this delegated implementation workflow or invokes orchestration.
+description: Plan and implement a feature through a lead, compact Luna discovery, tiny sequential tasks for a reused Luna worker, and fresh reviewers who fix findings agreed by the lead. Use when the user requests this delegated implementation workflow or invokes orchestration.
 ---
 
 # Orchestration
@@ -15,7 +15,9 @@ This skill is self-contained and does not require other skills.
 - Keep the lead on the current conversation model. Default every scout, worker,
   and reviewer to `gpt-5.6-luna`. Honor an explicit user model override.
 - Apply the model through the spawning tool, not merely in the agent's prompt.
-  Start agents without parent history (`fork_turns: "none"` or equivalent).
+  Start new agents without parent history (`fork_turns: "none"` or equivalent).
+  Reuse the implementation worker through follow-up messages by default; fresh
+  reviewers are mandatory on every review pass.
 - Confirm the host supports delegation and the selected model before starting.
   If unavailable, report `BLOCKED` and the missing capability; do not silently
   substitute a model or implement the task yourself.
@@ -32,6 +34,19 @@ This skill is self-contained and does not require other skills.
   Resolve genuinely ambiguous ownership before modifying overlapping work.
 - Follow project instructions and existing authorization. The skill does not grant
   permission to commit, push, deploy, mutate remote data, or add paid dependencies.
+
+## Communication boundary
+
+Never read subagent conversation histories, transcripts, or internal context, even
+to recover a missing result. Communicate through explicit task briefs and compact
+reports only: JSON or equally short free-form text matching the requested report
+fields. Ask for missing evidence with a targeted follow-up, not a history dump.
+The lead may inspect repository code, diffs, and focused check output directly.
+
+Give enough direction to make each assignment precise, but do not supply code,
+patches, or line-by-line pseudocode. Describe the intended behavior, owning layer,
+high-level implementation idea, constraints, and relevant pitfalls. The subagent
+chooses and writes the actual implementation.
 
 ## 1. Narrow discovery
 
@@ -63,26 +78,59 @@ Read the code identified by the JSON and the directly coupled callers/consumers.
 Treat the JSON as a search map, not proof. Expand the search only where a concrete
 gap requires it; delegate another bounded search if the missing area is large.
 
-State the intended product behavior and write a concise implementation plan:
-subtasks in dependency order, owning areas, acceptance criteria, and focused
-validation. Resolve material product ambiguity with the user; make routine
-engineering decisions yourself. Group small coupled changes when splitting them
-would add handoffs without improving correctness.
+State the intended product behavior and split the plan into very small subtasks
+in dependency order. Each should have one narrow, verifiable outcome; keep coupled
+edits together only when needed to make that outcome coherent. Do not hand the
+worker a whole feature or a batch to execute autonomously. Resolve material product
+ambiguity with the user; make routine engineering decisions yourself.
 
-## 3. Implement through workers
+Before assigning each subtask, define its Definition of Done (DoD):
 
-For each subtask or coherent small group:
+- A stable task ID, the exact behavior to deliver, and scope/non-goals.
+- Useful paths, the high-level implementation idea, and decisions already made.
+- Relevant edge cases, invariants, and pitfalls to account for.
+- Observable acceptance criteria and the smallest appropriate checks proving them.
+- The compact report expected before the next assignment.
 
-1. Start a fresh Luna worker with the plan slice, useful paths, relevant decisions,
-   acceptance criteria, validation requirements, and ownership boundaries.
-2. Ask it to inspect the actual code, implement the slice, and run appropriate
-   project checks. For a reproducible behavior bug, capture a failing regression
-   test before fixing it when the existing infrastructure supports that.
-3. Require a compact report: changed files, behavior delivered, checks and outcomes,
-   remaining issues, and any deviation from the plan. Avoid full logs unless needed
-   to diagnose a failure. Do not mark unrun checks as passing.
-4. Inspect the result and the relevant diff yourself. If acceptance criteria are
-   incomplete, return the worker to the missing work before starting the next slice.
+## 3. Implement one tiny subtask at a time
+
+Start one Luna worker and retain its agent ID. You may reuse the discovery scout
+as the worker if its context is useful and the host supports continuation. Send
+exactly one subtask with its DoD, wait for its report, and verify completion before
+sending the next subtask to the same agent. Reuse its knowledge of the implementation
+instead of forcing every new worker to rediscover the project.
+
+The worker implements only its current assignment and runs its focused checks.
+For a reproducible behavior bug, ask for a failing regression test before the fix
+when existing infrastructure supports it. It must not pick the next task itself.
+
+Require a short completion report, for example:
+
+```json
+{
+  "task": "T1",
+  "status": "done",
+  "changes": [{"path": "src/example.ts", "effect": "Behavior delivered"}],
+  "dod": [{"criterion": "Expected outcome", "evidence": "Check or observation"}],
+  "checks": [{"command": "project test command", "result": "passed"}],
+  "open": []
+}
+```
+
+Use `blocked` or `incomplete` when appropriate, and put failures, missing checks,
+deviations, and questions in `open`. Free-form reports with the same facts are fine.
+Do not send source dumps or full logs, and do not label unrun checks as passing.
+
+The lead compares the evidence with the DoD and inspects the relevant diff as needed.
+Return incomplete work to the same worker with precise corrections. Start the next
+subtask only after the current DoD is met. Keep prompts complete enough to explain
+the required outcome from start to finish, without prescribing the implementation
+as code or expanding the assignment.
+
+The lead may replace the worker with a fresh Luna agent when independent judgment
+would reduce bias, context has become stale, the area changes substantially, or
+continuation is unavailable. Provide a compact handoff with current decisions,
+paths, completed outcomes, and the next DoD; never transfer or read agent histories.
 
 The lead can run checks and inspect code but delegates every implementation edit.
 Keep the queue and integration decisions in the lead's context, not worker histories.
@@ -102,18 +150,27 @@ transaction boundaries for persistence; authorization and input validation at tr
 boundaries; retries, cancellation, idempotency, and error visibility for async work;
 producer/consumer compatibility for contracts. Do not invent irrelevant audit work.
 
-The reviewer must:
+Each review pass has two stages:
 
-1. Independently inspect the combined changes and relevant surrounding behavior.
-2. Identify substantiated bugs, missed requirements, regressions, and material
-   maintainability problems. Explain a concrete failure or impact, not speculative
-   style preferences. Do not restrict findings to P0/P1 only.
-3. Fix its own actionable findings within the authorized scope, add meaningful
-   regression coverage where appropriate, and rerun affected checks. The original
-   implementation worker must not be assigned these review fixes.
-4. Return a compact report: findings with evidence, fixes and files, checks and
-   results, unresolved issues, and a readiness verdict. A reviewer that changed code
-   cannot provide the final clean verdict for its own fixes.
+1. **Investigate and report, without edits.** The fresh reviewer independently
+   inspects the combined changes and surrounding behavior. It returns a compact
+   list of substantiated bugs, missed requirements, regressions, bottlenecks, and
+   material maintainability problems. Each finding needs an ID, location, concrete
+   failure/impact, evidence or uncertainty, and a suggested verification. Avoid
+   speculative style preferences; do not restrict findings to P0/P1 only. Report
+   checks, remaining limitations, and a readiness verdict when there are no issues.
+2. **Lead decision, then fixes by the same reviewer.** The lead assesses the findings
+   and sends specific instructions about what to verify and how, which findings
+   are accepted, and the intended correction with its DoD. For an uncertain finding,
+   ask the reviewer for a bounded read-only check first, then decide. The reviewer
+   edits only after the lead agrees, fixes the accepted issues, adds meaningful
+   regression coverage where appropriate, and reruns affected checks. Keep these
+   assignments small and sequential too. It reports fixes and DoD evidence through
+   the same compact protocol. Do not assign review fixes to the original worker.
+
+Agreement here is the lead's engineering decision within the user's existing
+authorization, not a new user approval gate. A reviewer that changed code cannot
+provide the final clean verdict for its own fixes.
 
 After any review fix, start another fresh Luna reviewer with the same independent
 brief updated for current scope and checks. Review all task changes again. If a

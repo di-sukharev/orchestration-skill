@@ -1,4 +1,4 @@
 interface:
   display_name: "Orchestration"
-  short_description: "Lead planning with Luna workers and fresh reviews"
-  default_prompt: "Use $orchestration to plan and implement this feature through Luna discovery, workers, and fresh reviewers who fix their findings."
+  short_description: "Tiny tasks for a reused Luna worker, fresh reviews"
+  default_prompt: "Use $orchestration to plan this feature, give one Luna worker tiny sequential tasks with precise completion criteria, and run fresh reviews with lead-agreed fixes."
