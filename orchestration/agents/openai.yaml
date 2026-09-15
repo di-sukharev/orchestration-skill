@@ -1,4 +1,4 @@
 interface:
   display_name: "Orchestration"
-  short_description: "Lead, subagents, and one subtask at a time"
-  default_prompt: "Use $orchestration to split this task into subtasks and complete them one at a time through subagents, with sufficient quality and minimal time and token cost."
+  short_description: "Subagent planning, implementation, and review"
+  default_prompt: "Use $orchestration to have a subagent plan and implement this task, then finish it through fresh reviewing subagents guided by the lead."
