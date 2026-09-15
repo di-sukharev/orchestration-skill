@@ -1,4 +1,4 @@
 interface:
   display_name: "Orchestration"
-  short_description: "Lead, Luna, and one subtask at a time"
-  default_prompt: "Use $orchestration to split this task into subtasks and complete them one at a time through Luna, with sufficient quality and minimal time and token cost."
+  short_description: "Lead, subagents, and one subtask at a time"
+  default_prompt: "Use $orchestration to split this task into subtasks and complete them one at a time through subagents, with sufficient quality and minimal time and token cost."
