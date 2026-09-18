@@ -1,4 +1,4 @@
-# orchestration
+# orchestration-skill
 
 Саб-агенты реализуют задачу и проводят независимое ревью.
 
