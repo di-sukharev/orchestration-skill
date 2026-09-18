@@ -6,6 +6,9 @@ description: >-
   Use when the user requests an orchestration workflow.
 ---
 
+Requires the installed `loop-code-review` skill.
+Read its `SKILL.md` when starting review.
+
 ## Roles and rules
 
 You are the lead. You assign work and judge reports.
@@ -59,29 +62,11 @@ Then start independent review. No subtask commits.
 
 ## Review and fix
 
-1. You start a fresh reviewing subagent with the original requirements, accepted
-   clarifications, task scope, repository path, check results, and known risks.
-   Do not give it previous review conclusions.
-2. It reviews all current task changes, including new files, and affected code.
-   It looks beyond the risks you named and keeps reviewing after finding an issue.
-   Before editing, it reports material defects and DX problems caused or worsened
-   by this task. Each finding explains the failing scenario, violated requirement,
-   code location, impact, why existing safeguards fail, reproduction or a regression
-   test, and the smallest fix with its effects. It separates facts, assumptions,
-   and important gaps in the review.
-3. You judge the findings without reading code. Accept concrete problems supported by evidence.
-   Reject unsupported claims, personal preferences, and scope expansion with reasons.
-   Avoid overengineering during review: do not complicate a sufficient implementation
-   for hypothetical edge cases without evidence of a realistic failure scenario.
-   Weigh impact and likelihood without inventing probabilities.
-   Ask open-ended questions only if uncertainty about the evidence, consequences,
-   or proposed fix prevents a decision. The same subagent investigates.
-4. You tell that reviewing subagent to fix accepted findings.
-   Where practical, it writes a failing regression test, fixes the bug, and verifies
-   the result. It runs suitable checks before reporting back.
-5. After fixes, a fresh reviewer checks all updated task changes.
-   Finish when accepted findings and material review gaps are resolved
-   and applicable checks pass. Review any later changes too.
+Run `loop-code-review` for all current task changes. You remain the lead and
+use the selected subagent model; do not spawn a separate coordinator.
+Supply the original requirements, accepted clarifications, task scope,
+repository path, implementation report, check results, and known risks.
+Complete its review and fix process before finishing this task.
 
 ## Finish
 
