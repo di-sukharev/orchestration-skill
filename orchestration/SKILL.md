@@ -6,47 +6,36 @@ description: >-
   Use when the user requests an orchestration workflow.
 ---
 
-This workflow requires the installed `loop-code-review` skill.
-Before you start review, read its `SKILL.md`.
-
 ## Roles and rules
 
-You are the lead. Assign work. Evaluate reports.
-Subagents read project files, write code, and run checks.
+You are the lead. Assign work. Assess reports.
+Delegate project file inspection, code changes, and checks to subagents.
 Do not do these tasks yourself.
-Start each subagent yourself.
+Start every subagent yourself.
 Do not let subagents start other subagents.
 Do not read subagent histories.
 
-Use the user's selected model for all subagents.
-If the user does not select a model, use `gpt-5.6-luna` in Codex or `sonnet` in Claude Code.
-Set the model each time you start a subagent.
-If the selected model is not available, tell the user.
-Do not use another model.
-
-Give each new subagent the task context without the parent conversation history.
+Give each new subagent the task context without the parent history.
 In Codex, set `fork_turns: "none"`.
 In Claude Code, start a new `general-purpose` agent.
 
-While subagents work, use the longest wait that is appropriate and allowed by the runtime.
-Request status only to resolve a specific uncertainty or allow blocked work to continue.
-Keep user updates short and informative.
-Do not repeat unchanged status.
-Require findings and evidence in the report itself.
-Do not accept a report that only says the subagent sent a plan or report.
+Use the longest wait appropriate for the work and permitted by the runtime.
+Request status only to resolve uncertainty or unblock work.
+Send brief, informative updates when status changes.
+Require reports to contain findings and evidence.
+
+Give every subagent these rules:
 
 - Meet all requirements with the simplest sufficient solution.
   Keep the UX thoughtful, simple, and elegant.
   Keep the UI minimal.
   Avoid unnecessary clicks, modals, and controls.
-  Give these requirements to every subagent.
-- Do not open a browser for visual inspection.
-  Do not click through the application for visual inspection.
-  Subagents use code and results from checks to evaluate the work.
+- Do not use a browser for visual inspection.
+  Assess the code and check results.
   The user checks the visuals.
-- Subagents must run useful checks and all checks that the project requires.
+- Run useful checks and all checks that the project requires.
   Skip unrelated or redundant checks.
-  Reuse results that are still valid.
+  Reuse valid results.
   Fix failures caused by the task.
   Report unrelated failures.
 - Follow project instructions and user overrides.
@@ -55,49 +44,88 @@ Do not accept a report that only says the subagent sent a plan or report.
   Unless instructed otherwise, continue on the current branch.
 - Without user authorization, do not deploy to production, create branches, or create worktrees.
 
+## Model and effort selection
+
+Choose model and effort separately for each implementation, review, and fix assignment.
+Honor explicit user choices and budget limits within their stated scope.
+Choose unspecified settings without routine approval.
+Use the current runtime's supported options and capability descriptions.
+Do not assume a fixed model catalog or infer capabilities from names.
+
+Never select effort below `medium`, including inherited and fallback settings.
+Use `high` by default.
+Choose the least costly reliable option, including time and retries in the cost:
+
+| Task | Model | Effort |
+| --- | --- | --- |
+| Clear, localized, low-risk work with obvious checks | Lightweight | `medium` |
+| Related changes, ordinary debugging, or some uncertainty | Balanced | `high` |
+| Architecture, migrations, concurrency, security, or unclear failures across components | Stronger reasoning | `xhigh` when justified and supported; otherwise `high` |
+
+Treat these as starting points, not fixed pairs.
+Assess uncertainty, dependencies, and error consequences, not just file count or role.
+Choose reviewers for the risks they must detect, independently of the implementer's settings.
+
+If an automatic selection is unavailable, choose another suitable option.
+If no alternatives are exposed, use inherited or default settings that meet the effort minimum.
+If a user choice or the effort minimum is unavailable, report the limitation.
+Do not silently replace an explicit user choice.
+
+Set model and effort explicitly through supported tool parameters:
+
+- Codex: `model` and `reasoning_effort`.
+- Claude Code: the model selector, plus effort if exposed.
+
+Do not simulate unsupported effort with prompt wording.
+Briefly explain the settings when you start an agent or change them.
+
+If complexity increases or repeated attempts stall, reassess the settings within the user's limits.
+Increase effort for deeper reasoning or select a stronger model for broader capabilities.
+Resolve missing information, permissions, and tool failures directly.
+Before you replace an agent, stop it.
+Give its replacement the scope, findings, changes, and check results.
+Keep independent review rounds fresh, without prior review conclusions.
+
 ## Plan and implement
 
 Start one new implementer.
-Give the implementer the requirements, constraints, and concrete acceptance scenarios.
-Include failure modes that are directly relevant to the task.
+Supply requirements, constraints, concrete acceptance scenarios, and relevant failure modes.
 For asynchronous behavior, include ordering and delayed responses.
 
 Tell the implementer to investigate before choosing a mode:
 
-- **Light:** Use this mode for a localized change with clear behavior and a clear validation path.
+- **Light:** A localized change with clear behavior and checks.
   Complete implementation and checks without intermediate approval.
-- **Full:** Use this mode for changes that depend on each other, migrations, or material uncertainty.
+- **Full:** Dependent changes, migrations, or material uncertainty.
   Report findings, risks, and a proposed plan to the lead for approval.
 
-As the lead, assess the evidence for the Full plan.
+Assess the evidence for the Full plan.
 Agree on checkpoints only for consequential decisions.
 
-If new findings require Full mode, the implementer must report the findings before expanding the work.
-Otherwise, the implementer must pause only for a blocker or a consequential decision outside the implementer's authority.
-Require one completion report with the result, changed files, checks and their outcomes, and unresolved issues.
+If new findings require Full mode, require a report before the implementer expands the work.
+Otherwise, permit pauses only for blockers or consequential decisions outside the implementer's authority.
+Require one completion report: result, changed files, check outcomes, and unresolved issues.
 
 Assess the completion report's evidence.
-If the work is not complete, ask the same implementer to complete it.
+Return incomplete work to the same implementer unless the selection rules require a stronger model or effort.
 After implementation is complete, start independent review.
 Do not commit individual subtasks.
 
 ## Review and fix
 
-Run `loop-code-review` for all current task changes.
-You remain the lead.
-Use the selected subagent model.
+Before review, read the installed `loop-code-review` skill's `SKILL.md`.
+Run its complete review and fix process for all current task changes.
+Remain the lead.
 Do not start a separate coordinator.
+Apply this model and effort policy instead of that skill's default model selection.
 Supply the original requirements, accepted clarifications, task scope, repository path, implementation report, check results, and known risks.
-Before you finish the task, complete the review and fix process from `loop-code-review`.
 
 ## Finish
 
-Resolve obstacles within the current task.
-Then continue the work.
-Pause the task only when human action is necessary.
-If human action is necessary, tell the user what action is needed.
+Resolve obstacles within the task scope.
+Continue until completion.
+Pause only when human action is necessary.
+State the required action.
 Write subagent instructions in English.
 Write the final response in the user's language.
 Include results, checks, and remaining issues.
-
-Use each step to advance the task or resolve a material uncertainty.
