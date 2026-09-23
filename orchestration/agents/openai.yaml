@@ -1,4 +1,4 @@
 interface:
   display_name: "Orchestration"
-  short_description: "Subagent planning, implementation, and review"
-  default_prompt: "Use $orchestration to have a subagent plan and implement this task, then finish it through fresh reviewing subagents guided by the lead."
+  short_description: "Lead planning, subagent implementation and review"
+  default_prompt: "Use $orchestration to delegate research, write a plan, assign subtasks sequentially, and run independent review before committing and pushing authorized changes."

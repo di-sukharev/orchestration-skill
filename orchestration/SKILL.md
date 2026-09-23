@@ -1,131 +1,74 @@
 ---
 name: orchestration
-description: >-
-  Coordinate a complete implementation through subagents.
-  Use one subagent to plan and implement. Use new subagents for independent review.
-  Use when the user requests an orchestration workflow.
+description: >
+  Coordinate research, planning, sequential implementation, and independent
+  review through subagents. Use when the user requests orchestration.
 ---
 
-## Roles and rules
+## Rules
 
-You are the lead. Assign work. Assess reports.
-Delegate project file inspection, code changes, and checks to subagents.
-Do not do these tasks yourself.
-Start every subagent yourself.
-Do not let subagents start other subagents.
-Do not read subagent histories.
+Minimize total token cost, including retries.
+Own decisions and the plan.
+Delegate code inspection, edits, and checks.
+Only you can start agents.
+Do not read agent histories.
 
-Give each new subagent the task context without the parent history.
-In Codex, set `fork_turns: "none"`.
-In Claude Code, start a new `general-purpose` agent.
+Follow project rules and user choices.
+Preserve unrelated changes.
+Use supported models and effort settings.
 
-Use the longest wait appropriate for the work and permitted by the runtime.
-Request status only to resolve uncertainty or unblock work.
-Send brief, informative updates when status changes.
-Require reports to contain findings and evidence.
+Use Luna in Codex or Sonnet in Claude Code for research and implementation.
+Choose review models and effort by risk.
+Use stronger models when complexity requires them.
 
-Give every subagent these rules:
+Start new agents without parent history.
+In Codex, use `fork_turns: "none"`.
 
-- Meet all requirements with the simplest sufficient solution.
-  Keep the UX thoughtful, simple, and elegant.
-  Keep the UI minimal.
-  Avoid unnecessary clicks, modals, and controls.
-- Do not use a browser for visual inspection.
-  Assess the code and check results.
-  The user checks the visuals.
-- Run useful checks and all checks that the project requires.
-  Skip unrelated or redundant checks.
-  Reuse valid results.
-  Fix failures caused by the task.
-  Report unrelated failures.
-- Follow project instructions and user overrides.
-  Do not modify unrelated changes.
-  Exclude unrelated changes from the task's work, review, and commits.
-  Unless instructed otherwise, continue on the current branch.
-- Without user authorization, do not deploy to production, create branches, or create worktrees.
+Give each agent the repository, scope, constraints, relevant evidence,
+expected result, and checks.
+Request results, file references, check outcomes, and blockers.
+Reuse valid evidence. Request updates only when needed for a decision.
 
-## Model and effort selection
+## Research
 
-Choose model and effort separately for each implementation, review, and fix assignment.
-Honor explicit user choices and budget limits within their stated scope.
-Choose unspecified settings without routine approval.
-Use the current runtime's supported options and capability descriptions.
-Do not assume a fixed model catalog or infer capabilities from names.
+Check that `loop-code-review` is available.
+Start one agent for read-only research.
+Request project rules, initial working-tree state, relevant code paths,
+reusable APIs, affected callers, checks, and consequential unknowns.
 
-Never select effort below `medium`, including inherited and fallback settings.
-Use `high` by default.
-Choose the least costly reliable option, including time and retries in the cost:
+## Plan
 
-| Task | Model | Effort |
-| --- | --- | --- |
-| Clear, localized, low-risk work with obvious checks | Lightweight | `medium` |
-| Related changes, ordinary debugging, or some uncertainty | Balanced | `high` |
-| Architecture, migrations, concurrency, security, or unclear failures across components | Stronger reasoning | `xhigh` when justified and supported; otherwise `high` |
+Write the plan from the research evidence.
+Use ASD-STE100 clarity principles: short sentences and consistent terms.
 
-Treat these as starting points, not fixed pairs.
-Assess uncertainty, dependencies, and error consequences, not just file count or role.
-Choose reviewers for the risks they must detect, independently of the implementer's settings.
+Define:
+- Scope and observable Definition of Done.
+- The simplest complete UX, including required states.
+- Code ownership and reuse that keep implementation and maintenance simple.
+- Ordered subtasks, dependencies, expected results, and checks.
+- Relevant failure cases and required safeguards.
 
-If an automatic selection is unavailable, choose another suitable option.
-If no alternatives are exposed, use inherited or default settings that meet the effort minimum.
-If a user choice or the effort minimum is unavailable, report the limitation.
-Do not silently replace an explicit user choice.
+Where needed, specify transaction boundaries, rollback, asynchronous ordering,
+retries, duplicate handling, permissions, compatibility, and migrations.
+Resolve consequential unknowns before dependent work.
 
-Set model and effort explicitly through supported tool parameters:
+## Implement
 
-- Codex: `model` and `reasoning_effort`.
-- Claude Code: the model selector, plus effort if exposed.
+Assign one subtask at a time. Reuse the research agent when useful.
+Accept each result against the plan.
+Return incomplete work to its agent.
+Revise the plan when evidence changes.
+Stop an agent before replacing it.
 
-Do not simulate unsupported effort with prompt wording.
-Briefly explain the settings when you start an agent or change them.
+## Review
 
-If complexity increases or repeated attempts stall, reassess the settings within the user's limits.
-Increase effort for deeper reasoning or select a stronger model for broader capabilities.
-Resolve missing information, permissions, and tool failures directly.
-Before you replace an agent, stop it.
-Give its replacement the scope, findings, changes, and check results.
-Keep independent review rounds fresh, without prior review conclusions.
-
-## Plan and implement
-
-Start one new implementer.
-Supply requirements, constraints, concrete acceptance scenarios, and relevant failure modes.
-For asynchronous behavior, include ordering and delayed responses.
-
-Tell the implementer to investigate before choosing a mode:
-
-- **Light:** A localized change with clear behavior and checks.
-  Complete implementation and checks without intermediate approval.
-- **Full:** Dependent changes, migrations, or material uncertainty.
-  Report findings, risks, and a proposed plan to the lead for approval.
-
-Assess the evidence for the Full plan.
-Agree on checkpoints only for consequential decisions.
-
-If new findings require Full mode, require a report before the implementer expands the work.
-Otherwise, permit pauses only for blockers or consequential decisions outside the implementer's authority.
-Require one completion report: result, changed files, check outcomes, and unresolved issues.
-
-Assess the completion report's evidence.
-Return incomplete work to the same implementer unless the selection rules require a stronger model or effort.
-After implementation is complete, start independent review.
-Do not commit individual subtasks.
-
-## Review and fix
-
-Before review, read the installed `loop-code-review` skill's `SKILL.md`.
-Run its complete review and fix process for all current task changes.
-Remain the lead.
-Do not start a separate coordinator.
-Apply this model and effort policy instead of that skill's default model selection.
-Supply the original requirements, accepted clarifications, task scope, repository path, implementation report, check results, and known risks.
+After implementation, run `loop-code-review` on all task changes.
+Remain the coordinator. Apply this skill's model policy.
+Give fresh reviewers the requirements, scope, checks, and known risks.
+Exclude previous review conclusions.
 
 ## Finish
 
-Resolve obstacles within the task scope.
-Continue until completion.
-Pause only when human action is necessary.
-State the required action.
-Write subagent instructions in English.
-Write the final response in the user's language.
-Include results, checks, and remaining issues.
+Confirm that the Definition of Done is met.
+After review passes, commit and push only task changes within user authorization.
+Report the result, checks, remaining issues, commit, and push status.
