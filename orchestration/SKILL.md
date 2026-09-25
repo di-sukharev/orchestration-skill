@@ -27,7 +27,7 @@ If the worker reports a larger scope or a higher risk, change the route.
 | --- | --- | --- |
 | S | One change chain, up to 3 files, clear checks, low risk | One assignment: research, implement, check |
 | M | Related changes or material uncertainty | Research, plan, implement |
-| L | High risk: migrations, data, security, concurrency, public contracts, or failures across components | Research, plan, implement with checkpoints |
+| L | High risk: migrations, persisted data, security, concurrency, contracts that external code uses, or unclear failures across components | Research, plan, implement with checkpoints |
 
 ## Worker
 
