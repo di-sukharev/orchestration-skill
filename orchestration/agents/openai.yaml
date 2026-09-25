@@ -1,4 +1,4 @@
 interface:
   display_name: "Orchestration"
-  short_description: "Lead planning, subagent implementation and review"
-  default_prompt: "Use $orchestration to delegate research, write a plan, assign subtasks sequentially, and run independent review before committing and pushing authorized changes."
+  short_description: "Risk-based routing, one worker, independent review"
+  default_prompt: "Use $orchestration to choose a route by risk, delegate research and implementation to one worker, and run risk-based independent review before committing and pushing authorized changes."
