@@ -1,6 +1,10 @@
 # Orchestration
 
-Обычно дорогая модель сама читает и пишет весь код задачи. Orchestration поручает чтение и написание кода дешёвой модели. Дорогая модель только планирует задачу и принимает работу. Перед коммитом и пушем код проверяет [Loop Code Review](https://github.com/di-sukharev/loop-code-review-skill).
+Чтобы дорогая модель не тратила свой дорогой контекст, она аутсорсит чтение и написание кода дешёвым саб-агентам.
+
+Выходит чуть дольше и чуть дешевле. На моих тестах вместо $20 — когда всю задачу целиком выполняла умная и дорогая модель — получилось сделать её же за $15. Это ~25%, но я не уверен, что задачу на $100 получится сделать за $75, а не за $95.
+
+Короче, это авторский экспериментальный скилл.
 
 ## Установка
 
@@ -14,13 +18,13 @@ https://github.com/di-sukharev/loop-code-review-skill
 
 ## Запуск
 
-Напишите `/orchestration <задача>`. В Codex напишите `$orchestration <задача>`. Если пуш не нужен, допишите «без пуша».
+Напишите `/orchestration <задача>`. Если пуш не нужен, допишите «без пуша».
 
 ## Другие скиллы
 
-- [Code Scout](https://github.com/di-sukharev/code-scout-skill) поручает поиск кода дешёвой модели.
-- [Loop Tasks](https://github.com/di-sukharev/loop-tasks-skill) запускает для каждой задачи нового агента с чистым контекстом.
-- [Loop Code Review](https://github.com/di-sukharev/loop-code-review-skill) отдаёт код новому ревьюеру без истории чата.
-- [Refactoring](https://github.com/di-sukharev/refactoring-skill) меняет код, только если следующая задача станет проще.
+- [Code Scout](https://github.com/di-sukharev/code-scout-skill) — дешёвый саб-агент ищет нужный код и приносит его на тарелке.
+- [Loop Tasks](https://github.com/di-sukharev/loop-tasks-skill) — каждую задачу из списка делает новый саб-агент с чистым контекстом.
+- [Ревью в цикле](https://github.com/di-sukharev/loop-code-review-skill) — саб-агенты без контекста в цикле находят и исправляют проблемы в изменениях.
+- [Рефакторинг](https://github.com/di-sukharev/refactoring-skill) — чистит код от легаси, лишних абстракций, слабых тестов и других жидких реализаций.
 
 [Инструкция для агента](orchestration/SKILL.md) · [Лицензия MIT](LICENSE)
