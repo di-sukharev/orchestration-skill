@@ -1,4 +1,6 @@
 interface:
   display_name: "Orchestration"
-  short_description: "Risk-based routing, one worker, independent review"
-  default_prompt: "Use $orchestration to choose a route by risk, delegate research and implementation to one worker, and run risk-based independent review before committing and pushing authorized changes."
+  short_description: "A cheaper model writes the code for a task"
+  default_prompt: "Use $orchestration to complete this task from plan to commit."
+policy:
+  allow_implicit_invocation: false

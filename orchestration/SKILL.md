@@ -1,92 +1,81 @@
 ---
 name: orchestration
-description: >
-  Coordinate research, planning, implementation, and independent review
-  through subagents at the lowest total cost. Use when the user requests orchestration.
+description: >-
+  Runs one task from plan to commit. A cheaper worker agent writes the code,
+  and loop-code-review checks it. Use when the user asks for orchestration.
 ---
+
+## Goal
+
+Your tokens usually cost the most, so a cheaper worker reads and writes the code.
+If no rule fits a case, keep the code work with the worker. Count retries and your own turns in the total cost.
 
 ## Rules
 
-- You are the lead. You own the route, the plan, and all decisions.
-- Minimize the total cost of each completed task. Include retries and your own turns.
-- Agents inspect code, edit code, and run checks. To settle a decision, you can read up to 100 lines of code. Do not explore or edit.
-- Only you start agents. Start each agent without parent history. Do not read agent histories.
-- Do not poll agents. Wait for their reports.
-- Write agent messages in English. Write the final report in the user's language.
-- Follow project rules and user choices. User model and effort choices override this skill.
-- Before the first assignment, check that `loop-code-review` is available.
-- Before the first assignment, record `git status --short --untracked-files=all`. Use it to separate the task files from earlier changes.
-- Preserve unrelated changes.
+- You are the lead. You own the plan and all decisions. Do not explore or edit code. To verify a claim, read only the code that it cites. For more, ask the agent.
+- If `loop-code-review` is not available, stop. Ask the user to install it from https://github.com/di-sukharev/loop-code-review-skill.
+- Before the first assignment, record `git status --short --untracked-files=all` as the baseline.
+- Running this skill allows a commit and a push after a passed review, unless the user excludes them.
+- Follow project rules. Write to agents in English and to the user in the user's language.
 
-## Route
+## Risk
 
-Choose a route before the first assignment. If you are not sure, choose M.
-If the worker reports a larger scope or a higher risk, change the route.
+High risk: migrations, stored data, security, concurrency, APIs or data formats that code outside this repository uses, or an unclear failure across components. Other tasks have normal risk.
 
-| Route | When | Flow |
-| --- | --- | --- |
-| S | One change chain, up to 3 files, clear checks, low risk | One assignment: research, implement, check |
-| M | Related changes or material uncertainty | Research, plan, implement |
-| L | High risk: migrations, persisted data, security, concurrency, contracts that external code uses, or unclear failures across components | Research, plan, implement with checkpoints |
+## Agents
 
-## Worker
+- Claude Code: `subagent_type: general-purpose`, `model: sonnet`.
+- Codex: Luna, `reasoning_effort: medium` (`high` at high risk), `fork_turns: "none"`. Use the longest `wait_agent` timeout.
+- The user's model and effort choices override these settings.
+- Send all assignments to one worker. Its first message is the Worker brief section verbatim, then the task context. Do not poll the worker.
+- Escalate only after two failed fix attempts or two reports without progress. A `wait_agent` timeout is not a report. In Codex, also escalate when the risk becomes high.
+- To escalate, replace the worker with a stronger one. Give it the brief, the task context, the plan, the changes, and the last report.
+- Escalate in this order: `high` effort, then a stronger model. Claude Code can only change the model. If no step is left or an agent cannot start, stop and report.
 
-One worker researches, implements, and fixes its own failures.
-Send each new assignment to the same worker with `SendMessage` (Claude Code) or `send_input` (Codex).
+## Steps
 
-- Claude Code: `subagent_type: effort-medium` and `model: sonnet`. For route L, use `effort-high`. If no agent type matches the chosen effort, use the nearest type and tell the user. If these agent types are missing, use `general-purpose` and tell the user that the worker inherits the session effort.
-- Codex: Luna, `reasoning_effort: medium` (`high` for route L), and `fork_turns: "none"`. Use the longest `wait` timeout.
-- Escalate one step only when the route changes to L, checks fail after two fix attempts, or the worker stalls. A stall is two reports without progress. A `wait` timeout is not a stall. The steps are `medium`, `high`, and a stronger model. Stop the old worker. Give the new worker the plan, findings, changes, and check results.
+A task is small if it has normal risk, up to 3 files, one goal, clear checks, and no unknowns that can change the solution. If you are not sure, it is not small. For a small task, start at step 3.
+Each assignment includes the task context: the repository path, scope, constraints, relevant evidence, and checks. An implementation assignment also includes the Definition of Done (DoD).
 
-## Brief
+1. Research. Send a read-only assignment. Ask for the code paths, data model, reusable APIs, affected callers, checks, and unknowns that can change the plan.
+2. Plan. From the evidence, write:
+   - the scope and an observable DoD;
+   - the simplest complete UX, with the required states;
+   - data model changes: what is stored where, with which constraints, and one source of truth for each fact;
+   - code ownership and reuse, and the code and data that the change replaces and removes;
+   - ordered subtasks with expected results and checks;
+   - safeguards: transactions, rollback, asynchronous order, retries, duplicates, permissions, compatibility, and migrations.
 
-Send this brief in the first message to the worker:
-
-- Meet the requirements with the simplest sufficient change. Keep the UX simple and the UI minimal.
-- Search before you read. Read only the ranges you need.
-- Run the narrowest relevant checks. Reuse valid results. Fix failures that the task causes. Report other failures.
-- If a check still fails after two fix attempts, stop and report.
-- Do not use a browser for visual checks.
-- Do not commit, push, create branches, or start agents.
-- If the scope or risk exceeds the assignment, stop and report.
-- Report briefly and in English: result, changed files, checks, blockers, and decisions needed. Use `file:line` references. Do not paste code or full logs. Quote only failing check lines.
-
-Add the repository path, scope, constraints, relevant evidence, and checks.
-Add the Definition of Done (DoD) to each implementation assignment.
-
-## Plan
-
-For routes M and L, the first assignment is read-only research.
-Request the relevant code paths, reusable APIs, affected callers, checks, and consequential unknowns.
-
-Write the plan from the evidence:
-
-- Scope and an observable DoD.
-- The simplest complete UX, including the required states.
-- Code ownership and reuse.
-- Ordered subtasks with expected results and checks.
-- Relevant failure cases and safeguards: transactions, rollback, asynchronous order, retries, duplicates, permissions, compatibility, and migrations.
-
-Resolve consequential unknowns before dependent work.
-
-## Implement
-
-- Send the full plan to the worker in one message.
-- For route L, add checkpoints at consequential decisions, such as a schema, an API contract, or a migration. The worker stops at each checkpoint for acceptance.
-- Accept results against the plan. Return incomplete work to the worker.
-- When the evidence changes, revise the plan.
-
-## Review
-
-Run `loop-code-review` on all task changes.
-Give it the risk (high for route L, normal for routes S and M), the requirements with accepted clarifications, the DoD, the task files, the check results, and the known risks.
-Do not give it the plan or the worker's conclusions.
+   Resolve unknowns that can change the plan before the work that depends on them.
+3. Implement. For a small task, send one assignment to research, implement, and check. Otherwise, send the full plan in one message. At high risk, add checkpoints at hard-to-change decisions, such as a schema, an API contract, or a migration. Accept results against the DoD and the plan. Return incomplete work. If the scope or risk grows, or the evidence changes, go back to step 2.
+4. Review. Run `loop-code-review` on all task changes with the task's risk. Do not give reviewers the plan.
+5. Commit. Make sure that the reports confirm the DoD and passing checks. If the review status is open or a task file has changes in the baseline, ask the user. Otherwise, run `git add` on the new task files. Run `git commit -- <task files>`. Push without force. If there is no remote, skip the push. If the push fails, stop and report.
 
 ## Finish
 
-- Confirm the DoD and the passing checks from the reports.
-- If the review status is open, report it and ask the user.
-- If the review status is passed, commit and push only the task changes, within user authorization. Add new task files, then run `git commit -- <task files>`.
-- Do not commit a file that had changes before the task. Report it.
-- Report the result, checks, remaining issues, and commit and push status.
-- Report the cost: route, agents, rounds, models, efforts, and subagent tokens if the runtime reports them.
+Report the result, checks, human checks, unresolved issues, and the commit and push status.
+Also report the cost: agents, rounds, models, efforts, and agent tokens if known.
+
+## Worker brief
+
+You are the worker. The lead does not read code, so your reports must be enough for its decisions.
+
+### Work
+
+- Do only the current assignment. At a checkpoint, stop until the lead accepts.
+- Meet the requirements with the simplest sufficient change. Keep the UX simple and the UI minimal.
+- Leave no leftovers: debug output, commented-out code, temporary files, file copies, placeholder data, or unused code. Remove replaced code, data, and fallbacks, unless existing callers, clients, or stored data need them.
+- Search before you read. Read only the ranges that you need.
+- Run the narrowest relevant checks. Reuse valid results. Fix the failures that the task causes, and report other failures.
+- If a check still fails after two fix attempts, stop and report. Do the same if the scope or risk is larger than the assignment.
+
+### Limits
+
+- Change only the files that your work needs. Do not stash, reset, or check out files.
+- Do not use a browser for visual checks.
+- Do not commit, push, create branches, start agents, deploy, or write to shared or production data.
+
+### Report
+
+Report briefly and in English, with `file:line` references. Do not paste code or full logs. Quote only the failing check lines.
+Include the result, changed files, checks, blockers, and the decisions that you need.

@@ -1,35 +1,25 @@
-# orchestration-skill
+# Orchestration
 
-Лид выбирает маршрут по риску и пишет план. Один агент-исполнитель исследует код и реализует план. Независимое ревью идёт через `loop-code-review`.
+Обычно дорогая модель сама читает и пишет весь код задачи. Orchestration поручает чтение и написание кода дешёвой модели. Дорогая модель только планирует задачу и принимает работу. Перед коммитом и пушем код проверяет [Loop Code Review](https://github.com/di-sukharev/loop-code-review-skill).
 
 ## Установка
 
+Отправьте агенту это сообщение.
+
 ```text
-Установи глобально скиллы и Claude-агентов из этих репозиториев:
+Установи скиллы глобально
 https://github.com/di-sukharev/orchestration-skill
 https://github.com/di-sukharev/loop-code-review-skill
 ```
 
-Вручную: папку `orchestration` скопируйте в `~/.claude/skills/` или `~/.codex/skills/`, файлы `claude-agents/*.md` — в `~/.claude/agents/`. После первой установки агентов перезапустите Claude Code. Без этих агентов субагенты Claude Code наследуют effort сессии и стоят дороже.
+## Запуск
 
-## Использование
+Напишите `/orchestration <задача>`. В Codex напишите `$orchestration <задача>`. Если пуш не нужен, допишите «без пуша».
 
-```text
-/orchestration
-Реализуй <текст задачи>.
-```
+## Другие скиллы
 
-1. Лид выбирает маршрут: S — малая задача, M — обычная, L — высокий риск.
-2. Исполнитель (Sonnet или Luna, effort `medium`, для L — `high`) исследует код и выполняет весь план одним заданием.
-3. `loop-code-review`: свежий ревьюер (Opus или Sol) находит и исправляет существенные дефекты. Глубина зависит от риска, максимум 3 раунда.
-4. Лид проверяет Definition of Done, делает commit и push в рамках разрешения и сообщает расход.
+- [Code Scout](https://github.com/di-sukharev/code-scout-skill) поручает поиск кода дешёвой модели.
+- [Loop Tasks](https://github.com/di-sukharev/loop-tasks-skill) запускает для каждой задачи нового агента с чистым контекстом.
+- [Loop Code Review](https://github.com/di-sukharev/loop-code-review-skill) отдаёт код новому ревьюеру без истории чата.
 
-Модель и effort повышаются только после сбоя или при росте риска. Лиду обычно хватает effort `high`.
-
-Ваши настройки приоритетнее:
-
-```text
-Используй <модель> с effort <уровень> для всех саб-агентов.
-```
-
-[MIT](LICENSE).
+[Инструкция для агента](orchestration/SKILL.md) · [Лицензия MIT](LICENSE)
