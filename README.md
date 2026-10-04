@@ -22,9 +22,9 @@ https://github.com/di-sukharev/loop-code-review-skill
 
 ## Другие скиллы
 
-- [Code Scout](https://github.com/di-sukharev/code-scout-skill) — дешёвый саб-агент ищет нужный код и приносит его на тарелке.
-- [Loop Tasks](https://github.com/di-sukharev/loop-tasks-skill) — каждую задачу из списка делает новый саб-агент с чистым контекстом.
-- [Ревью в цикле](https://github.com/di-sukharev/loop-code-review-skill) — саб-агенты без контекста в цикле находят и исправляют проблемы в изменениях.
-- [Рефакторинг](https://github.com/di-sukharev/refactoring-skill) — чистит код от легаси, лишних абстракций, слабых тестов и других жидких реализаций.
+- [Code Scout](https://github.com/di-sukharev/code-scout-skill) — саб-агент ищет код — дешёвый агент поглупее ищет нужный код и приносит его умному агенту, чтобы тот не тратил свой дорогой контекст.
+- [Loop Tasks](https://github.com/di-sukharev/loop-tasks-skill) — выполнение задач в цикле — каждую задачу из списка делает новый саб-агент, чтобы одного агента не уводило в сторону на большом количестве задач.
+- [Loop Code Review](https://github.com/di-sukharev/loop-code-review-skill) — ревью только что написанного кода в цикле — саб-агенты без контекста в цикле находят и исправляют проблемы в активных изменениях.
+- [Refactoring](https://github.com/di-sukharev/refactoring-skill) — профилактический рефакторинг кода — чистит код от легаси, лишних абстракций, слабых тестов и других жидких реализаций.
 
 [Инструкция для агента](orchestration/SKILL.md) · [Лицензия MIT](LICENSE)

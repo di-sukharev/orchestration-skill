@@ -54,7 +54,7 @@ Each assignment includes the task context: the repository path, scope, constrain
 ## Finish
 
 Report the result, checks, human checks, unresolved issues, and the commit and push status.
-Also report the cost: agents, rounds, models, efforts, and agent tokens if known.
+Also report the cost: agents, rounds, models, and efforts.
 
 ## Worker brief
 
