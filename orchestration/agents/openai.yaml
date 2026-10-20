@@ -1,6 +1,6 @@
 interface:
   display_name: "Orchestration"
-  short_description: "A cheaper model writes the code for a task"
-  default_prompt: "Use $orchestration to complete this task from plan to commit."
+  short_description: "Separate sub-agents plan, implement, and review tasks"
+  default_prompt: "Use $orchestration to complete these tasks in separate contexts."
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true
