@@ -6,30 +6,29 @@ description: >-
   or several substantial tasks.
 ---
 
-Keep task contexts separate. Each sub-agent owns one task from planning through review.
-Follow project rules. Use English with sub-agents and the user's language with the user.
-Requires [loop-code-review](https://github.com/di-sukharev/loop-code-review-skill).
+Use English with sub-agents and the user's language with the user.
 
 ## Orchestrator
 
 Start a fresh sub-agent without chat history for each task. Use a strong model (Sol or Opus) at high effort unless the user specifies otherwise.
-Give each sub-agent one task from the user's list and the sub-agent instructions below.
+Give each sub-agent the repository path, its task, completion criteria, relevant context, and the sub-agent instructions below.
 
-Run tasks sequentially unless they are clearly independent and can run without conflicting edits.
+Run tasks sequentially by default. Run them in parallel if they are independent and their edits will not conflict.
 Start dependent tasks only after their prerequisites are complete.
-Keep your context small. You manage the tasks; the sub-agents do the work and check it through `loop-code-review`.
-Report task progress, results, and blockers.
+Your role is limited to launching agents, coordinating tasks, and reporting progress, results, and blockers.
+Leave all investigation, planning, implementation, checks, and review to the task agents.
 
 ## Sub-agent instructions
 
 Read project instructions and investigate your task. Write a plan, implement it, and run the relevant checks.
 Inspect the current Git state before editing and preserve existing work.
-Communicate directly with other active sub-agents or sessions when possible. Agree on who changes what to avoid conflicts.
+When tasks affect shared files, coordinate with the other task agents and agree on who edits each file.
 Keep working on parts that do not conflict while coordination is pending.
 Prefer working without a worktree; create branches or worktrees only when the user requests them.
 
-Run `loop-code-review` on your task's changes, preserving other work. Let it manage the reviewer sub-agents and review loop.
-Report completion only when review is `passed`. If the required review cannot run, report the task as incomplete.
+Run [loop-code-review](https://github.com/di-sukharev/loop-code-review-skill) on your task's changes only.
+Report completion only when relevant checks pass and review is `passed`.
+Otherwise, report the task as incomplete and explain what remains.
 
 Finish with the result, checks, review status, remaining issues, and a suggested commit message.
 Do not commit or push unless the user explicitly asks.
